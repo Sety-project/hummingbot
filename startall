@@ -1,0 +1,19 @@
+#!/bin/bash
+
+source ~/miniconda3/etc/profile.d/conda.sh
+conda init bash
+
+cd ../gateway || exit
+PASSWORD=$(grep HUMMINGMOT ~/.cache/setyvault/.env | cut -d '=' -f 2)
+nohup yarn start --passphrase="$PASSWORD" > gateway.log 2>&1 &
+echo "Gateway started"
+
+cd ../dashboard || exit
+conda activate dashboard
+sudo chmod 6666 /var/run/docker.sock
+nohup make run > dashboard.log 2>&1 &
+echo "Dashboard started"
+
+cd ../hummingbot || exit
+conda activate hummingbot
+./start
